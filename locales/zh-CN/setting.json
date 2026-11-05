@@ -3291,6 +3291,7 @@
   "workspace.member.profileModal.responsibilitiesHint": "显示在成员工牌上",
   "workspace.member.profileModal.responsibilitiesPlaceholder": "负责的领域和工作内容，方便同事和 AI 知道该找谁",
   "workspace.member.profileModal.role": "角色",
+  "workspace.member.profileModal.rolePlaceholder": "选择角色",
   "workspace.member.profileModal.save": "保存",
   "workspace.member.profileModal.success": "档案已更新",
   "workspace.member.profileModal.title": "编辑 {{username}} 的档案",

@@ -3202,6 +3202,7 @@ When I am ___, I need ___
     'What this person owns and works on, so teammates and AI know who to ask',
   'workspace.member.profileModal.responsibilitiesHint': 'Shown on the member badge',
   'workspace.member.profileModal.role': 'Role',
+  'workspace.member.profileModal.rolePlaceholder': 'Select a role',
   'workspace.member.profileModal.save': 'Save',
   'workspace.member.profileModal.success': 'Profile updated',
   'workspace.member.profileModal.title': 'Edit profile for {{username}}',
