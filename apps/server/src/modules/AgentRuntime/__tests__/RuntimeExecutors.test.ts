@@ -92,19 +92,16 @@ vi.mock('@lobechat/model-runtime', async () => {
   };
 
   return {
-    // The executor resolves extend params via this helper; an empty result keeps
-    // the runtime payload unchanged, matching this suite's pre-existing behavior.
+    // Empty results keep the runtime payload and compression window at defaults.
     applyModelExtendParams: vi.fn(function () {
       return {};
     }),
+    getModelPropertyWithFallback: vi.fn().mockResolvedValue(undefined),
     resolveEffectiveReasoningChatConfig,
     consumeStreamUntilDone: vi.fn().mockResolvedValue(undefined),
     // `llmErrorClassification.ts` reads these at module-load time. Keep the
     // terminal media-timeout transport contract available to the executor test below.
     ERROR_CODE_SPECS: errorCodeSpecs,
-    // The compression transport reads the compression model's context window;
-    // no metadata falls back to the default window.
-    getModelPropertyWithFallback: vi.fn().mockResolvedValue(undefined),
     getErrorCodeSpec: (code: string) =>
       errorCodeSpecs[code as keyof typeof errorCodeSpecs] as
         (typeof errorCodeSpecs)[keyof typeof errorCodeSpecs] | undefined,
