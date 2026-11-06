@@ -69,6 +69,18 @@ describe('chainCompressContext', () => {
     ).toBeLessThanOrEqual(maxInputTokens);
   });
 
+  it('re-checks the clipped head when the message has a dense head and a sparse tail', () => {
+    // Dense head (~6k tokens) followed by a long whitespace tail that inflates the char count.
+    const dense = largeContent('dense').repeat(3) + ' '.repeat(400_000);
+    const maxInputTokens = 3000;
+
+    expect(
+      promptTokens(
+        chainCompressContext([message('m-dense', dense)], undefined, { maxInputTokens }),
+      ),
+    ).toBeLessThanOrEqual(maxInputTokens);
+  });
+
   it('clips an oversized existing summary so the newest messages still fit', () => {
     const maxInputTokens = 10_000;
     const hugeSummary = largeContent('summary').repeat(20);

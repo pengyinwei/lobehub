@@ -43,13 +43,25 @@ const estimateTokens = (text: string) =>
   Math.ceil(estimateTokenCount(text) * TOKEN_DRIFT_MULTIPLIER);
 
 /**
- * Clip `text` to roughly `maxTokens`, keeping the head so the opening
- * (command, request, file path) survives. Characters are scaled by the token
- * share with a 10% margin for uneven token density.
+ * Clip `text` to at most `maxTokens`, keeping the head so the opening
+ * (command, request, file path) survives. The cut is first scaled from the
+ * whole text's token share, then the clipped result is re-estimated and shrunk
+ * until it fits: a token-dense head followed by a sparse tail (e.g. whitespace
+ * padding) would otherwise keep nearly all of its tokens.
  */
-const clipToTokens = (text: string, tokens: number, maxTokens: number) =>
-  text.slice(0, Math.max(0, Math.floor(text.length * (maxTokens / tokens) * 0.9))) +
-  OMITTED_MESSAGE_CONTENT;
+const clipToTokens = (text: string, tokens: number, maxTokens: number) => {
+  let length = Math.floor(text.length * (maxTokens / tokens) * 0.9);
+
+  while (length > 0) {
+    const clipped = text.slice(0, length) + OMITTED_MESSAGE_CONTENT;
+    const clippedTokens = estimateTokens(clipped);
+    if (clippedTokens <= maxTokens) return clipped;
+
+    length = Math.min(length - 1, Math.floor(length * (maxTokens / clippedTokens) * 0.9));
+  }
+
+  return OMITTED_MESSAGE_CONTENT;
+};
 
 const formatHistory = (messages: UIChatMessage[], omittedCount: number) => {
   const omittedNote =
@@ -103,9 +115,12 @@ export const fitCompressContextMessages = (
       continue;
     }
 
-    if (kept.length === 0 && remaining > 0) {
+    // Budget left for the content itself once the `<role></role>` wrapper is paid for.
+    const contentBudget = remaining - estimateTokens(`<${message.role}></${message.role}>\n`);
+
+    if (kept.length === 0 && contentBudget > 0) {
       const content = typeof message.content === 'string' ? message.content : '';
-      kept.unshift({ ...message, content: clipToTokens(content, tokens, remaining) });
+      kept.unshift({ ...message, content: clipToTokens(content, tokens, contentBudget) });
     }
 
     break;
