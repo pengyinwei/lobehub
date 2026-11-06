@@ -1,6 +1,6 @@
 'use client';
 
-import { ActionIcon, Button, createStaticStyles, Flexbox } from '@lobehub/ui';
+import { ActionIcon, Button, createStaticStyles, Flexbox, Text } from '@lobehub/ui';
 import isEqual from 'fast-deep-equal';
 import { ArrowLeft, ChevronLeft } from 'lucide-react';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 import NavHeader from '@/features/NavHeader';
+import { SettingsHeaderActionsContext } from '@/features/Settings/features/SettingsHeaderActions';
 import { useToolStore } from '@/store/tool';
 import { agentSkillsSelectors, builtinToolSelectors } from '@/store/tool/selectors';
 import { isMobileSurface } from '@/utils/mobileSurface';
@@ -28,6 +29,11 @@ export interface SelectedTool {
 }
 
 const styles = createStaticStyles(({ css }) => ({
+  headerActions: css`
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  `,
   detail: css`
     overflow-y: auto;
     flex: 1;
@@ -72,6 +78,7 @@ export const ToolSettings = memo<ToolSettingsProps>(({ viewMode }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const querySkillIdentifier = searchParams.get('skill');
   const [selected, setSelected] = useState<SelectedTool | null>(null);
+  const [headerActions, setHeaderActions] = useState<HTMLElement | null>(null);
   const stackedSelected = stacked
     ? parseMobileSelection(searchParams.get(MOBILE_SELECTION_PARAM))
     : undefined;
@@ -203,33 +210,40 @@ export const ToolSettings = memo<ToolSettingsProps>(({ viewMode }) => {
   if (stacked)
     return (
       <>
-        <NavHeader />
-        <div className={styles.page}>
-          <div className={styles.pageBody}>
-            {stackedSelected ? (
-              <>
-                <Flexbox horizontal align={'center'} paddingBlock={12} paddingInline={4}>
-                  <Button icon={ArrowLeft} type={'text'} onClick={closeStackedDetail}>
-                    {t('skillView.connectors', { ns: 'setting' })}
-                  </Button>
-                </Flexbox>
-                <SkillDetail
-                  identifier={stackedSelected.identifier}
-                  type={stackedSelected.type}
-                  onDelete={closeStackedDetail}
+        <NavHeader
+          right={<div className={styles.headerActions} ref={setHeaderActions} />}
+          styles={{ center: { alignItems: 'center' } }}
+        >
+          <Text weight={500}>{t('tab.connector', { ns: 'setting' })}</Text>
+        </NavHeader>
+        <SettingsHeaderActionsContext value={headerActions}>
+          <div className={styles.page}>
+            <div className={styles.pageBody}>
+              {stackedSelected ? (
+                <>
+                  <Flexbox horizontal align={'center'} paddingBlock={12} paddingInline={4}>
+                    <Button icon={ArrowLeft} type={'text'} onClick={closeStackedDetail}>
+                      {t('skillView.connectors', { ns: 'setting' })}
+                    </Button>
+                  </Flexbox>
+                  <SkillDetail
+                    identifier={stackedSelected.identifier}
+                    type={stackedSelected.type}
+                    onDelete={closeStackedDetail}
+                  />
+                </>
+              ) : (
+                <LeftPanel
+                  fullWidth
+                  page
+                  viewMode={viewMode}
+                  onDeleteSelected={closeStackedDetail}
+                  onSelect={handleSelect}
                 />
-              </>
-            ) : (
-              <LeftPanel
-                fullWidth
-                page
-                viewMode={viewMode}
-                onDeleteSelected={closeStackedDetail}
-                onSelect={handleSelect}
-              />
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </SettingsHeaderActionsContext>
       </>
     );
 
