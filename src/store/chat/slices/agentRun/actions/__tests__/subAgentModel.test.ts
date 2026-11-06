@@ -71,6 +71,34 @@ describe('sub-agent model resolution', () => {
 
     expect(agentConfig.agentConfig).toMatchObject(OWN);
   });
+
+  it('keeps a group member on its own model even when the topic has a pinned model', () => {
+    useChatStore.setState({
+      topicDataMap: {
+        [TEST_IDS.SESSION_ID]: {
+          topics: [
+            {
+              groupId: 'test-group-id',
+              id: TEST_IDS.TOPIC_ID,
+              model: 'gpt-5.6-luna',
+              provider: 'openai',
+            } as any,
+          ],
+        },
+      },
+    });
+
+    const { agentConfig } = useChatStore.getState().internal_createAgentState({
+      agentId: TEST_IDS.SESSION_ID,
+      isSubAgent: true,
+      messages: [createMockMessage()],
+      parentMessageId: TEST_IDS.USER_MESSAGE_ID,
+      subAgentId: 'member-agent-id',
+      topicId: TEST_IDS.TOPIC_ID,
+    });
+
+    expect(agentConfig.agentConfig).toMatchObject(OWN);
+  });
 });
 
 describe('resolveSubAgentModel', () => {
