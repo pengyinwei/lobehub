@@ -102,6 +102,9 @@ vi.mock('@lobechat/model-runtime', async () => {
     // `llmErrorClassification.ts` reads these at module-load time. Keep the
     // terminal media-timeout transport contract available to the executor test below.
     ERROR_CODE_SPECS: errorCodeSpecs,
+    // The compression transport reads the compression model's context window;
+    // no metadata falls back to the default window.
+    getModelPropertyWithFallback: vi.fn().mockResolvedValue(undefined),
     getErrorCodeSpec: (code: string) =>
       errorCodeSpecs[code as keyof typeof errorCodeSpecs] as
         (typeof errorCodeSpecs)[keyof typeof errorCodeSpecs] | undefined,
