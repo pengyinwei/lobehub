@@ -187,6 +187,8 @@ describe('compressContext executor', () => {
     expect(compressionBuildPrompt).toHaveBeenCalledWith({
       existingSummary: undefined,
       messages: [{ content: 'history', id: 'msg-history', role: 'user' }],
+      model: 'gpt-4',
+      provider: 'openai',
     });
     expect(llmStream).toHaveBeenCalledWith(
       {
@@ -368,6 +370,8 @@ describe('compressContext executor', () => {
     expect(compressionBuildPrompt).toHaveBeenCalledWith({
       existingSummary: 'First prior summary\n\nSecond prior summary',
       messages: [{ content: 'recent question', id: 'msg-recent', role: 'user' }],
+      model: 'gpt-4',
+      provider: 'openai',
     });
     expect(compressionFinalizeGroup).toHaveBeenCalledWith(
       expect.objectContaining({

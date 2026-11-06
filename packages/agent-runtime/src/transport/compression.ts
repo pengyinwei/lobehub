@@ -19,6 +19,12 @@ export interface CompressionGroupCreateResult {
 export interface CompressionPromptInput {
   existingSummary?: string;
   messages: UIChatMessage[];
+  /**
+   * Model that will summarize the prompt. Transports use it to fit the history
+   * into that model's context window.
+   */
+  model?: string;
+  provider?: string;
 }
 
 export interface CompressionPromptResult {

@@ -176,6 +176,8 @@ export const compressContext =
       const compressionPayload = await compression.buildPrompt({
         existingSummary: persistedExistingSummary || existingSummary,
         messages: compressionResult.messagesToSummarize,
+        model: compressionModel.model,
+        provider: compressionModel.provider,
       });
 
       let streamedSummary = '';
