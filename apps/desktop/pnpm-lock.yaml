@@ -643,6 +643,9 @@ importers:
       '@lobechat/const':
         specifier: workspace:*
         version: link:../const
+      tokenx:
+        specifier: ^1.3.0
+        version: 1.6.0
     devDependencies:
       '@lobechat/types':
         specifier: workspace:*
